@@ -1,6 +1,6 @@
 "use client";
 
-import Anthropic, { APIError } from "@anthropic-ai/sdk";
+import Anthropic, { APIError, APIConnectionTimeoutError } from "@anthropic-ai/sdk";
 import { computeAllCards } from "@/lib/numerology";
 import { SYSTEM_PROMPT, buildReportToolForInput, buildUserPrompt } from "@/lib/prompt";
 import { buildFallbackNarrative } from "@/lib/fallbackNarrative";
@@ -12,7 +12,31 @@ const DEFAULT_MODEL = "claude-sonnet-5";
 
 export type InterpretResult = InterpretResponse & { cards: AllCardsResult };
 
+const REQUEST_TIMEOUT_MS = 55_000;
+
+const VALID_GROUPS = new Set(["core", "flow", "question"]);
+
+function isValidReport(
+  value: unknown
+): value is { sections: NarrativeSection[]; closing: string } {
+  if (!value || typeof value !== "object") return false;
+  const v = value as Record<string, unknown>;
+  if (!Array.isArray(v.sections) || v.sections.length === 0) return false;
+  if (typeof v.closing !== "string" || !v.closing.trim()) return false;
+  return v.sections.every(
+    (s) =>
+      s &&
+      typeof s === "object" &&
+      typeof (s as NarrativeSection).heading === "string" &&
+      typeof (s as NarrativeSection).body === "string" &&
+      VALID_GROUPS.has((s as NarrativeSection).group)
+  );
+}
+
 function describeError(error: unknown): string {
+  if (error instanceof APIConnectionTimeoutError) {
+    return "AI 응답이 너무 오래 걸려서 기다림을 멈췄어요. 질문 개수를 줄이거나 다시 시도해보세요.";
+  }
   if (error instanceof APIError) {
     if (error.status === 401) return "API 키가 올바르지 않은 것 같아요. 설정에서 키를 다시 확인해주세요.";
     if (error.status === 429) return "지금 요청이 많아 잠시 제한됐어요(요금/사용량 한도일 수 있어요).";
@@ -48,14 +72,17 @@ export async function getInterpretation(input: IntakeInput): Promise<InterpretRe
   try {
     const anthropic = new Anthropic({ apiKey, dangerouslyAllowBrowser: true });
 
-    const response = await anthropic.messages.create({
-      model: DEFAULT_MODEL,
-      max_tokens: 4096,
-      system: SYSTEM_PROMPT,
-      messages: [{ role: "user", content: buildUserPrompt(input, cards) }],
-      tools: [buildReportToolForInput(input)],
-      tool_choice: { type: "tool", name: "submit_report" },
-    });
+    const response = await anthropic.messages.create(
+      {
+        model: DEFAULT_MODEL,
+        max_tokens: 4096,
+        system: SYSTEM_PROMPT,
+        messages: [{ role: "user", content: buildUserPrompt(input, cards) }],
+        tools: [buildReportToolForInput(input)],
+        tool_choice: { type: "tool", name: "submit_report" },
+      },
+      { timeout: REQUEST_TIMEOUT_MS }
+    );
 
     const toolUse = response.content.find(
       (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
@@ -64,10 +91,10 @@ export async function getInterpretation(input: IntakeInput): Promise<InterpretRe
       throw new Error("AI 응답에서 리포트를 찾을 수 없습니다.");
     }
 
-    const parsed = toolUse.input as {
-      sections: NarrativeSection[];
-      closing: string;
-    };
+    if (!isValidReport(toolUse.input)) {
+      throw new Error("AI 응답 형식이 예상과 달라요.");
+    }
+    const parsed = toolUse.input;
 
     return {
       cards,
