@@ -1,5 +1,5 @@
-import Image from "next/image";
 import { getCardById } from "@/lib/cardData";
+import { withBasePath } from "@/lib/basePath";
 
 type Props = {
   roleLabel: string;
@@ -22,12 +22,11 @@ export default function CardBadge({ roleLabel, cardId, highlight }: Props) {
         {roleLabel}
       </span>
       <div className="relative aspect-[3/5] w-full overflow-hidden rounded-lg border border-rose-100 bg-sand-100">
-        <Image
-          src={card.image}
+        {/* eslint-disable-next-line @next/next/no-img-element -- 정적 export에서 basePath 경로를 직접 제어하기 위해 next/image 대신 사용 */}
+        <img
+          src={withBasePath(card.image)}
           alt={`${card.id}번 ${card.nameKo}`}
-          fill
-          sizes="128px"
-          className="object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
       <div className="leading-tight">

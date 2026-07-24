@@ -1,5 +1,6 @@
 import { Document, Page, View, Text, Image, Font, StyleSheet } from "@react-pdf/renderer";
 import { getCardById } from "@/lib/cardData";
+import { withBasePath } from "@/lib/basePath";
 import type { AllCardsResult } from "@/lib/numerology";
 import type { IntakeInput, NarrativeSection } from "@/lib/types";
 
@@ -9,8 +10,8 @@ function ensureFontsRegistered() {
   Font.register({
     family: "NotoSerifKR",
     fonts: [
-      { src: "/fonts/NotoSerifKR-Regular.ttf", fontWeight: "normal" },
-      { src: "/fonts/NotoSerifKR-Bold.ttf", fontWeight: "bold" },
+      { src: withBasePath("/fonts/NotoSerifKR-Regular.ttf"), fontWeight: "normal" },
+      { src: withBasePath("/fonts/NotoSerifKR-Bold.ttf"), fontWeight: "bold" },
     ],
   });
   // 긴 한글 문장 줄바꿈 시 단어(글자) 단위 하이픈 분리를 막는다.
@@ -151,7 +152,7 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
               <View key={label} style={styles.cardCol}>
                 <Text style={styles.cardRole}>{label}</Text>
                 {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image, not an HTML img */}
-                <Image src={card.image} style={styles.cardImage} />
+                <Image src={withBasePath(card.image)} style={styles.cardImage} />
                 <Text style={styles.cardName}>
                   {card.id}. {card.nameKo}
                 </Text>

@@ -3,6 +3,8 @@
 import { useState } from "react";
 import IntakeForm from "@/components/IntakeForm";
 import ResultView from "@/components/ResultView";
+import ApiKeySettings from "@/components/ApiKeySettings";
+import { getInterpretation } from "@/lib/interpretClient";
 import type { AllCardsResult } from "@/lib/numerology";
 import type { IntakeInput, NarrativeSection } from "@/lib/types";
 
@@ -26,16 +28,7 @@ export default function Home() {
   async function handleIntakeSubmit(input: IntakeInput) {
     setStage({ step: "loading", input });
     try {
-      const res = await fetch("/api/interpret", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(input),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error || "해석을 생성하는 중 문제가 발생했어요.");
-      }
-      const data = await res.json();
+      const data = await getInterpretation(input);
       setStage({
         step: "result",
         input,
@@ -74,7 +67,10 @@ export default function Home() {
   return (
     <main className="flex flex-1 flex-col items-center justify-center px-4 py-10 sm:py-16">
       {stage.step === "intake" && (
-        <IntakeForm onSubmit={handleIntakeSubmit} submitting={false} />
+        <div className="flex w-full flex-col items-center gap-4">
+          <IntakeForm onSubmit={handleIntakeSubmit} submitting={false} />
+          <ApiKeySettings />
+        </div>
       )}
 
       {stage.step === "loading" && (
