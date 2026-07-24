@@ -84,6 +84,11 @@ export default function ResultView({
         <h2 className="text-center text-lg font-medium text-ink">
           3년의 흐름 — 작년 · 올해 · 내년
         </h2>
+        <p className="text-center text-xs text-ink-soft">
+          이 세 장은 1월~12월 달력이 아니라 {nameLabel}의 생일({input.birth.month}월{" "}
+          {input.birth.day}일)을 기준으로 나뉘어요. 생일부터 다음 생일 전날까지가 한 해로
+          이어집니다.
+        </p>
         <div className="flex items-end justify-center gap-3 py-2 sm:gap-5">
           <CardBadge
             roleLabel="작년카드"
