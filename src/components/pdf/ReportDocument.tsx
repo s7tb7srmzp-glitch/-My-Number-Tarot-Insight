@@ -1,4 +1,4 @@
-import { Document, Page, View, Text, Image, Font, StyleSheet } from "@react-pdf/renderer";
+import { Document, Page, View, Text, Image, Font, StyleSheet, Svg, Path, Circle } from "@react-pdf/renderer";
 import { getCardById } from "@/lib/cardData";
 import { withBasePath } from "@/lib/basePath";
 import { groupSections } from "@/lib/sectionGrouping";
@@ -15,6 +15,20 @@ function ensureFontsRegistered() {
       { src: withBasePath("/fonts/NotoSerifKR-Bold.ttf"), fontWeight: "bold" },
     ],
   });
+  Font.register({
+    family: "NanumMyeongjo",
+    fonts: [
+      { src: withBasePath("/fonts/NanumMyeongjo-Regular.ttf"), fontWeight: "normal" },
+      { src: withBasePath("/fonts/NanumMyeongjo-Bold.ttf"), fontWeight: "bold" },
+    ],
+  });
+  Font.register({
+    family: "NanumGothic",
+    fonts: [
+      { src: withBasePath("/fonts/NanumGothic-Regular.ttf"), fontWeight: "normal" },
+      { src: withBasePath("/fonts/NanumGothic-Bold.ttf"), fontWeight: "bold" },
+    ],
+  });
   // 긴 한글 문장 줄바꿈 시 단어(글자) 단위 하이픈 분리를 막는다.
   Font.registerHyphenationCallback((word) => [word]);
   fontsRegistered = true;
@@ -26,6 +40,9 @@ const SAND_BG = "#FDFBF7";
 const SAND_LINE = "#EFE3D3";
 const INK = "#4A3B35";
 const INK_SOFT = "#7A6A5F";
+const INK_DEEP = "#2A1F1B";
+const META_GRAY = "#8C8C8C";
+const GLINT_GOLD = "#C9A15D";
 
 const styles = StyleSheet.create({
   page: {
@@ -137,6 +154,52 @@ const styles = StyleSheet.create({
     color: INK_SOFT,
     textAlign: "center",
   },
+  coverPage: {
+    backgroundColor: SAND_BG,
+    fontFamily: "NanumGothic",
+    padding: 56,
+    flexDirection: "column",
+  },
+  coverRunningHead: {
+    fontFamily: "NanumGothic",
+    fontSize: 9,
+    letterSpacing: 3,
+    color: ROSE_DARK,
+    textAlign: "center",
+  },
+  coverBlock: {
+    alignItems: "center",
+  },
+  coverTitle: {
+    fontFamily: "NanumMyeongjo",
+    fontWeight: "bold",
+    fontSize: 30,
+    color: INK_DEEP,
+    textAlign: "center",
+    marginTop: 14,
+    marginBottom: 10,
+  },
+  coverSubtitle: {
+    fontFamily: "NanumMyeongjo",
+    fontSize: 12,
+    color: ROSE_DARK,
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
+  coverDateLabel: {
+    fontFamily: "NanumGothic",
+    fontSize: 10,
+    color: META_GRAY,
+    textAlign: "center",
+    letterSpacing: 0.5,
+  },
+  coverFooterLine: {
+    fontFamily: "NanumGothic",
+    fontSize: 8,
+    color: INK_SOFT,
+    textAlign: "center",
+    marginTop: 3,
+  },
 });
 
 function Footer() {
@@ -144,6 +207,65 @@ function Footer() {
     <Text style={styles.footer} fixed>
       윤슬의 수비학 타로 상담 리포트 · 본 리포트는 성찰과 위로를 위한 참고 자료입니다.
     </Text>
+  );
+}
+
+/**
+ * "윤슬"(햇빛에 반짝이는 잔물결) 모티프의 절제된 장식.
+ * 얇은 물결 선 두 줄 + 옅은 빛 알갱이(작은 점) 몇 개로만 구성해 과하지 않게 표현한다.
+ */
+function RippleOrnament() {
+  return (
+    <Svg width="220" height="30" viewBox="0 0 220 30">
+      <Path
+        d="M0 14 C 18 4, 36 4, 55 14 S 92 24, 110 14 S 147 4, 165 14 S 202 24, 220 14"
+        stroke={ROSE}
+        strokeWidth={0.8}
+        strokeOpacity={0.55}
+        fill="none"
+      />
+      <Path
+        d="M10 21 C 28 13, 46 13, 64 21 S 100 29, 118 21 S 155 13, 173 21 S 209 29, 220 22"
+        stroke={ROSE_DARK}
+        strokeWidth={0.6}
+        strokeOpacity={0.3}
+        fill="none"
+      />
+      <Circle cx={30} cy={8} r={1.1} fill={GLINT_GOLD} fillOpacity={0.55} />
+      <Circle cx={78} cy={6} r={0.7} fill={ROSE} fillOpacity={0.45} />
+      <Circle cx={128} cy={9} r={0.9} fill={GLINT_GOLD} fillOpacity={0.4} />
+      <Circle cx={172} cy={6} r={0.6} fill={ROSE_DARK} fillOpacity={0.4} />
+      <Circle cx={200} cy={9} r={1} fill={ROSE} fillOpacity={0.4} />
+    </Svg>
+  );
+}
+
+function CoverPage({ nameLabel, consultDate }: { nameLabel: string; consultDate: string }) {
+  return (
+    <Page size="A4" style={styles.coverPage}>
+      <Text style={styles.coverRunningHead}>윤 슬 의 수 비 학 타 로 상 담 리 포 트</Text>
+
+      <View style={{ flex: 1.3 }} />
+
+      <View style={styles.coverBlock}>
+        <RippleOrnament />
+        <Text style={styles.coverTitle}>{nameLabel}의 이야기</Text>
+        <Text style={styles.coverSubtitle}>타고난 나, 그리고 3년의 흐름</Text>
+      </View>
+
+      <View style={{ flex: 1 }} />
+
+      <View style={styles.coverBlock}>
+        <Text style={styles.coverDateLabel}>상담 기준일 {consultDate}</Text>
+      </View>
+
+      <View style={{ flex: 0.7 }} />
+
+      <View style={styles.coverBlock}>
+        <Text style={styles.coverFooterLine}>본 리포트는 성찰과 위로를 위한 참고 자료입니다</Text>
+        <Text style={styles.coverFooterLine}>카드 해석은 고유의 수비학 체계를 바탕으로 합니다</Text>
+      </View>
+    </Page>
   );
 }
 
@@ -178,7 +300,10 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
   const birthdayLabel = `${input.birth.month}월 ${input.birth.day}일`;
 
   return (
-    <Document title={`${nameLabel} 수비학 타로 상담 리포트`}>
+    <Document title={`${nameLabel} · 윤슬의 수비학 타로 상담 리포트`}>
+      {/* 표지 */}
+      <CoverPage nameLabel={nameLabel} consultDate={input.consultDate} />
+
       {/* 1페이지: 타고난 나 (성격 + 영혼) */}
       <Page size="A4" style={styles.page} wrap>
         <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
