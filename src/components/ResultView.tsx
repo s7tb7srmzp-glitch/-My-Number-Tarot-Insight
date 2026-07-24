@@ -1,4 +1,5 @@
 import CardBadge from "./CardBadge";
+import { groupSections } from "@/lib/sectionGrouping";
 import type { AllCardsResult } from "@/lib/numerology";
 import type { IntakeInput, NarrativeSection } from "@/lib/types";
 
@@ -38,13 +39,12 @@ export default function ResultView({
 }: Props) {
   const nameLabel = input.name?.trim() ? `${input.name.trim()}님` : "내담자님";
 
-  const coreSections = sections.filter((s) => s.group === "core");
-  const flowSections = sections.filter((s) => s.group === "flow");
-  const questionSections = sections.filter((s) => s.group === "question");
-  // 혹시 group 태그가 없는 예외적인 응답이 오더라도 내용이 누락되지 않도록 안전망을 둔다.
-  const otherSections = sections.filter(
-    (s) => s.group !== "core" && s.group !== "flow" && s.group !== "question"
-  );
+  const {
+    core: coreSections,
+    flow: flowSections,
+    question: questionSections,
+    other: otherSections,
+  } = groupSections(sections, input.questions.length);
 
   let statusNote: string | null = null;
   if (!usedAI) {

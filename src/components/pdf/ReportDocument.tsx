@@ -1,6 +1,7 @@
 import { Document, Page, View, Text, Image, Font, StyleSheet } from "@react-pdf/renderer";
 import { getCardById } from "@/lib/cardData";
 import { withBasePath } from "@/lib/basePath";
+import { groupSections } from "@/lib/sectionGrouping";
 import type { AllCardsResult } from "@/lib/numerology";
 import type { IntakeInput, NarrativeSection } from "@/lib/types";
 
@@ -166,12 +167,12 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
   ensureFontsRegistered();
   const nameLabel = input.name?.trim() ? `${input.name.trim()}님` : "내담자님";
 
-  const coreSections = sections.filter((s) => s.group === "core");
-  const flowSections = sections.filter((s) => s.group === "flow");
-  const questionSections = sections.filter((s) => s.group === "question");
-  const otherSections = sections.filter(
-    (s) => s.group !== "core" && s.group !== "flow" && s.group !== "question"
-  );
+  const {
+    core: coreSections,
+    flow: flowSections,
+    question: questionSections,
+    other: otherSections,
+  } = groupSections(sections, input.questions.length);
 
   const hasQuestionPage = questionSections.length > 0;
   const birthdayLabel = `${input.birth.month}월 ${input.birth.day}일`;
