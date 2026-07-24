@@ -18,6 +18,8 @@ function todayIso(): string {
 
 export default function IntakeForm({ onSubmit, submitting }: Props) {
   const [name, setName] = useState("");
+  const [age, setAge] = useState("");
+  const [occupation, setOccupation] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [consultDate, setConsultDate] = useState(todayIso());
   const [questions, setQuestions] = useState(["", "", ""]);
@@ -44,11 +46,16 @@ export default function IntakeForm({ onSubmit, submitting }: Props) {
       return;
     }
 
+    const trimmedAge = age.trim();
+    const parsedAge = trimmedAge ? Number(trimmedAge) : undefined;
+
     onSubmit({
       name: name.trim(),
       birth: { year, month, day },
       consultDate: consultDate || todayIso(),
       questions: questions.map((q) => q.trim()).filter(Boolean).slice(0, 3),
+      age: parsedAge && Number.isFinite(parsedAge) ? parsedAge : undefined,
+      occupation: occupation.trim() || undefined,
     });
   }
 
@@ -78,6 +85,36 @@ export default function IntakeForm({ onSubmit, submitting }: Props) {
           className="rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-ink outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
         />
       </label>
+
+      <div className="flex gap-3">
+        <label className="flex flex-1 flex-col gap-1.5 text-sm text-ink">
+          나이 <span className="text-ink-soft">(선택)</span>
+          <input
+            type="number"
+            inputMode="numeric"
+            min={0}
+            max={120}
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
+            placeholder="예: 35"
+            className="rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-ink outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
+          />
+        </label>
+        <label className="flex flex-1 flex-col gap-1.5 text-sm text-ink">
+          직업 <span className="text-ink-soft">(선택)</span>
+          <input
+            type="text"
+            value={occupation}
+            onChange={(e) => setOccupation(e.target.value)}
+            placeholder="예: 회사원"
+            maxLength={40}
+            className="rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-ink outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
+          />
+        </label>
+      </div>
+      <p className="-mt-3 text-xs text-ink-soft">
+        나이·직업을 알려주시면 조언을 그 상황에 맞게 조정해드려요.
+      </p>
 
       <DateSelect
         label="생년월일"
