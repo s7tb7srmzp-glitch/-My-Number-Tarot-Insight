@@ -1,9 +1,9 @@
 import type { AllCardsResult } from "./numerology";
-import { getCardById } from "./cardData";
-import type { IntakeInput, InterpretResponse } from "./types";
+import { getCardById, type CardEntry } from "./cardData";
+import type { IntakeInput, InterpretResponse, NarrativeSection } from "./types";
 
 /**
- * AI API 키가 설정되지 않았을 때 사용하는 규칙 기반 서사 생성기.
+ * AI API 키가 없거나 AI 호출이 실패했을 때 쓰는 규칙 기반 서사 생성기.
  * AI만큼 매끄럽진 않지만, 카드 데이터를 조합해 다섯 장의 흐름을
  * 최소한의 문단으로라도 이어서 보여준다.
  */
@@ -18,36 +18,62 @@ export function buildFallbackNarrative(
   const thisOne = getCardById(cards.thisYear);
   const next = getCardById(cards.nextYear);
 
-  const sections = [
+  const sameCard = cards.personality === cards.soul;
+
+  const coreBody = sameCard
+    ? `${nameLabel}의 성격카드와 영혼카드는 모두 ${cards.personality}번 ${personality.nameKo}예요. ` +
+      `겉으로 드러나는 모습과 마음 깊은 곳의 본성이 같은 카드로 나타났다는 건, 겉과 속이 다르지 않고 ` +
+      `한결같은 사람이라는 뜻이기도 해요. ${personality.traits.slice(0, 3).join(", ")} 같은 면이 삶 전반에 ` +
+      `걸쳐 뚜렷하게 드러날 거예요. ${personality.advice} 특히 ${personality.careers.slice(0, 2).join(", ")} 같은 ` +
+      `분야에서 이 기질이 잘 발휘될 수 있어요.`
+    : `${nameLabel}의 성격카드는 ${cards.personality}번 ${personality.nameKo}, 영혼카드는 ${cards.soul}번 ${soul.nameKo}이에요. ` +
+      `겉으로 드러나는 모습에는 ${personality.traits[0]} 같은 면이 있고, 그 안쪽 깊은 곳에는 ${soul.traits[0]} 같은 마음이 ` +
+      `자리하고 있어요. 이 둘이 부딪힐 때도 있겠지만, ${personality.careers[0]} 같은 분야에서는 오히려 그 둘이 함께 ` +
+      `힘을 발휘할 수 있어요. ${personality.advice} 그리고 더 깊은 곳에서는, ${soul.advice}`;
+
+  const sections: NarrativeSection[] = [
     {
       heading: "성격과 영혼, 타고난 나",
-      body:
-        `${nameLabel}의 성격카드는 ${cards.personality}번 ${personality.nameKo}, 영혼카드는 ${cards.soul}번 ${soul.nameKo}이에요. ` +
-        `겉으로 드러나는 모습에는 ${personality.traits[0]} 같은 면이 있고, 그 안쪽 깊은 곳에는 ${soul.traits[0]} 같은 마음이 자리하고 있어요. ` +
-        `${personality.advice} ${soul.advice}`,
+      body: coreBody,
+      group: "core",
     },
     {
       heading: "작년에서 올해로 이어지는 흐름",
       body:
-        `작년은 ${cards.lastYear}번 ${last.nameKo}의 해였어요. ${last.yearCardTheme.title}이라는 주제 속에서 ${last.yearCardTheme.keyPoints[0]} 같은 흐름을 지나오셨을 거예요. ` +
-        `그 흐름을 딛고 올해는 ${cards.thisYear}번 ${thisOne.nameKo}의 해로 들어섰습니다. ${thisOne.yearCardTheme.title}. ${thisOne.yearCardTheme.keyPoints.slice(0, 2).join(" ")}`,
+        `작년은 ${cards.lastYear}번 ${last.nameKo}의 해였어요. ${last.yearCardTheme.title}이라는 주제 속에서 ` +
+        `${last.yearCardTheme.keyPoints[0]} 같은 흐름을 지나오셨을 거예요. 그 흐름을 딛고 올해는 ${cards.thisYear}번 ` +
+        `${thisOne.nameKo}의 해로 들어섰습니다. ${thisOne.yearCardTheme.title}. ${thisOne.yearCardTheme.keyPoints.slice(0, 2).join(" ")}`,
+      group: "flow",
     },
     {
-      heading: "올해의 메시지와 내년으로의 준비",
+      heading: "올해의 메시지",
       body:
-        `${thisOne.advice} 그리고 다가올 내년은 ${cards.nextYear}번 ${next.nameKo}의 해로, ${next.yearCardTheme.title}. ${next.yearCardTheme.keyPoints[0]} 지금부터 천천히 마음을 준비해보셔도 좋겠어요.`,
+        `${thisOne.advice} ${thisOne.yearCardTheme.keyPoints.slice(2).join(" ")} 지금 이 시기를 어떻게 보내느냐에 따라 ` +
+        `다음 흐름이 훨씬 수월해질 거예요.`,
+      group: "flow",
+    },
+    {
+      heading: "내년을 준비하며",
+      body:
+        `다가올 내년은 ${cards.nextYear}번 ${next.nameKo}의 해로, ${next.yearCardTheme.title}. ` +
+        `${next.yearCardTheme.keyPoints.slice(0, 2).join(" ")} 지금부터 천천히 마음을 준비해보셔도 좋겠어요.`,
+      group: "flow",
     },
   ];
 
   if (input.questions.length) {
-    sections.push({
-      heading: "질문에 대한 답",
-      body: input.questions
-        .map(
-          (q) =>
-            `"${q}" — 지금의 ${cards.thisYear}번 ${thisOne.nameKo} 흐름과 ${cards.soul}번 ${soul.nameKo}이 말해주는 본연의 마음을 함께 떠올려보시면, 조금 더 선명한 답을 찾아가실 수 있을 거예요.`
-        )
-        .join(" "),
+    const lenses: CardEntry[] = [thisOne, soul, personality, next, last];
+    input.questions.forEach((q, i) => {
+      const lens = lenses[i % lenses.length];
+      sections.push({
+        heading: `질문 ${i + 1}에 대한 답: "${q}"`,
+        body:
+          `"${q}"라는 질문을 남겨주셨네요. 지금 ${nameLabel}의 흐름을 보면, ${lens.id}번 ${lens.nameKo}이 말해주는 ` +
+          `"${lens.traits[0]}" 같은 면과 "${lens.yearCardTheme.title}"이라는 시기적 주제가 이 질문과 맞닿아 있어요. ` +
+          `${lens.advice} 구체적으로는 ${lens.yearCardTheme.keyPoints[0]} 이 부분을 염두에 두시면 좋겠고, ` +
+          `${lens.careers.length ? `${lens.careers[0]} 같은 방향으로 힘을 쏟아보시는 것도 도움이 될 수 있어요.` : "천천히 자신의 속도를 지켜보시면 좋겠어요."}`,
+        group: "question",
+      });
     });
   }
 
