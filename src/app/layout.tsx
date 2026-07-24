@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Serif_KR } from "next/font/google";
 import "./globals.css";
 
@@ -13,6 +13,26 @@ export const metadata: Metadata = {
   title: "수비학 타로 상담 | 나의 숫자, 나의 이야기",
   description:
     "생년월일로 성격·영혼·작년·올해·내년 카드를 자동 계산하고, 삶의 흐름을 서사로 풀어주는 자리이타 수비학 타로 상담 리포트.",
+  manifest: "/manifest.webmanifest",
+  icons: {
+    icon: [
+      { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }],
+  },
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "수비학 타로",
+  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: "#B76E79",
 };
 
 export default function RootLayout({
