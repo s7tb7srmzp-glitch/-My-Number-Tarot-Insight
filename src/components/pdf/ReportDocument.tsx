@@ -172,7 +172,7 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
     flow: flowSections,
     question: questionSections,
     other: otherSections,
-  } = groupSections(sections, input.questions.length);
+  } = groupSections(sections, input.questions);
 
   const hasQuestionPage = questionSections.length > 0;
   const birthdayLabel = `${input.birth.month}월 ${input.birth.day}일`;
