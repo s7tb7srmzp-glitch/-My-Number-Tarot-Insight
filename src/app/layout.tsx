@@ -13,7 +13,7 @@ const notoSerifKR = Noto_Serif_KR({
 export const metadata: Metadata = {
   title: "수비학 타로 상담 | 나의 숫자, 나의 이야기",
   description:
-    "생년월일로 성격·영혼·작년·올해·내년 카드를 자동 계산하고, 삶의 흐름을 서사로 풀어주는 자리이타 수비학 타로 상담 리포트.",
+    "생년월일로 성격·영혼·작년·올해·내년 카드를 자동 계산하고, 삶의 흐름을 서사로 풀어주는 윤슬의 수비학 타로 상담 리포트.",
   // Next.js가 basePath를 자동으로 붙여주지 않는 필드라 직접 prefix한다.
   manifest: withBasePath("/manifest.webmanifest"),
   icons: {
