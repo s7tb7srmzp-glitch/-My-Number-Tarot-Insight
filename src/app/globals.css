@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+:root {
+  /* 로즈골드 */
+  --color-rose-50: #fbf1ef;
+  --color-rose-100: #f5dfda;
+  --color-rose-200: #ebc3ba;
+  --color-rose-300: #dea295;
+  --color-rose-400: #cc8375;
+  --color-rose-500: #b76e79;
+  --color-rose-600: #9c5762;
+  --color-rose-700: #7e4550;
+  --color-rose-800: #5e333c;
+  --color-rose-900: #472730;
+
+  /* 웜 베이지 */
+  --color-sand-50: #fdfbf7;
+  --color-sand-100: #f8f1e7;
+  --color-sand-200: #efe3d3;
+  --color-sand-300: #e6d3b8;
+  --color-sand-400: #d9be99;
+  --color-sand-500: #c7a574;
+
+  --color-ink: #4a3b35;
+  --color-ink-soft: #7a6a5f;
+
+  --background: var(--color-sand-50);
+  --foreground: var(--color-ink);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-rose-50: var(--color-rose-50);
+  --color-rose-100: var(--color-rose-100);
+  --color-rose-200: var(--color-rose-200);
+  --color-rose-300: var(--color-rose-300);
+  --color-rose-400: var(--color-rose-400);
+  --color-rose-500: var(--color-rose-500);
+  --color-rose-600: var(--color-rose-600);
+  --color-rose-700: var(--color-rose-700);
+  --color-rose-800: var(--color-rose-800);
+  --color-rose-900: var(--color-rose-900);
+  --color-sand-50: var(--color-sand-50);
+  --color-sand-100: var(--color-sand-100);
+  --color-sand-200: var(--color-sand-200);
+  --color-sand-300: var(--color-sand-300);
+  --color-sand-400: var(--color-sand-400);
+  --color-sand-500: var(--color-sand-500);
+  --color-ink: var(--color-ink);
+  --color-ink-soft: var(--color-ink-soft);
+  --font-serif-kr: var(--font-noto-serif-kr);
+}
+
+body {
+  background: linear-gradient(180deg, var(--color-sand-100) 0%, var(--color-sand-50) 40%);
+  color: var(--foreground);
+  font-family: var(--font-serif-kr), "Nanum Myeongjo", serif;
+}
