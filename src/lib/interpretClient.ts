@@ -12,9 +12,20 @@ const DEFAULT_MODEL = "claude-sonnet-5";
 
 export type InterpretResult = InterpretResponse & { cards: AllCardsResult };
 
-const REQUEST_TIMEOUT_MS = 55_000;
+const REQUEST_TIMEOUT_MS = 75_000;
+
+// 질문이 2~3개면 요구되는 섹션 수가 6~7개(각 250~400자 이상)까지 늘어나
+// 예전 4096으로는 JSON 응답이 다 끝나기 전에 잘리는 경우가 있었다.
+const MAX_TOKENS = 8192;
 
 const VALID_GROUPS = new Set(["core", "flow", "question"]);
+
+class TruncatedResponseError extends Error {
+  constructor() {
+    super("AI 응답이 max_tokens 제한에 걸려 도중에 잘렸습니다.");
+    this.name = "TruncatedResponseError";
+  }
+}
 
 function isValidReport(
   value: unknown
@@ -34,6 +45,9 @@ function isValidReport(
 }
 
 function describeError(error: unknown): string {
+  if (error instanceof TruncatedResponseError) {
+    return "AI 응답이 너무 길어져서 도중에 잘렸어요. 질문 개수를 줄이거나 다시 시도해보세요.";
+  }
   if (error instanceof APIConnectionTimeoutError) {
     return "AI 응답이 너무 오래 걸려서 기다림을 멈췄어요. 질문 개수를 줄이거나 다시 시도해보세요.";
   }
@@ -75,7 +89,7 @@ export async function getInterpretation(input: IntakeInput): Promise<InterpretRe
     const response = await anthropic.messages.create(
       {
         model: DEFAULT_MODEL,
-        max_tokens: 4096,
+        max_tokens: MAX_TOKENS,
         system: SYSTEM_PROMPT,
         messages: [{ role: "user", content: buildUserPrompt(input, cards) }],
         tools: [buildReportToolForInput(input)],
@@ -83,6 +97,10 @@ export async function getInterpretation(input: IntakeInput): Promise<InterpretRe
       },
       { timeout: REQUEST_TIMEOUT_MS }
     );
+
+    if (response.stop_reason === "max_tokens") {
+      throw new TruncatedResponseError();
+    }
 
     const toolUse = response.content.find(
       (block): block is Anthropic.ToolUseBlock => block.type === "tool_use"
