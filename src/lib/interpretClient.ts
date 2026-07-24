@@ -18,8 +18,6 @@ const REQUEST_TIMEOUT_MS = 75_000;
 // 예전 4096으로는 JSON 응답이 다 끝나기 전에 잘리는 경우가 있었다.
 const MAX_TOKENS = 8192;
 
-const VALID_GROUPS = new Set(["core", "flow", "question"]);
-
 class TruncatedResponseError extends Error {
   constructor() {
     super("AI 응답이 max_tokens 제한에 걸려 도중에 잘렸습니다.");
@@ -27,6 +25,13 @@ class TruncatedResponseError extends Error {
   }
 }
 
+/**
+ * group 태그(core/flow/question) 값 자체는 여기서 검증하지 않는다. Anthropic 툴 호출은
+ * enum 제약을 100% 강제하지 않아서, 다른 내용은 멀쩡한데 섹션 하나의 group만 예상 밖의
+ * 값으로 나오는 경우가 실제로 있었다. 그런 사소한 태그 오류 때문에 잘 만들어진 리포트
+ * 전체를 버리고 기본 서사로 폴백하지 않도록, group 보정은 groupSections()에 맡기고
+ * 여기서는 화면에 실제로 표시할 heading/body가 비어있지 않은지만 확인한다.
+ */
 function isValidReport(
   value: unknown
 ): value is { sections: NarrativeSection[]; closing: string } {
@@ -39,8 +44,9 @@ function isValidReport(
       s &&
       typeof s === "object" &&
       typeof (s as NarrativeSection).heading === "string" &&
+      (s as NarrativeSection).heading.trim() !== "" &&
       typeof (s as NarrativeSection).body === "string" &&
-      VALID_GROUPS.has((s as NarrativeSection).group)
+      (s as NarrativeSection).body.trim() !== ""
   );
 }
 
