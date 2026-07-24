@@ -44,7 +44,7 @@ export default function ResultView({
     flow: flowSections,
     question: questionSections,
     other: otherSections,
-  } = groupSections(sections, input.questions.length);
+  } = groupSections(sections, input.questions);
 
   let statusNote: string | null = null;
   if (!usedAI) {
