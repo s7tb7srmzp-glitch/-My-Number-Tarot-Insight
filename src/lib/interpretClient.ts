@@ -2,7 +2,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { computeAllCards } from "@/lib/numerology";
-import { SYSTEM_PROMPT, REPORT_TOOL, buildUserPrompt } from "@/lib/prompt";
+import { SYSTEM_PROMPT, buildReportToolForInput, buildUserPrompt } from "@/lib/prompt";
 import { buildFallbackNarrative } from "@/lib/fallbackNarrative";
 import { getStoredApiKey } from "@/lib/apiKeyStore";
 import type { IntakeInput, InterpretResponse } from "@/lib/types";
@@ -32,10 +32,10 @@ export async function getInterpretation(input: IntakeInput): Promise<InterpretRe
 
     const response = await anthropic.messages.create({
       model: DEFAULT_MODEL,
-      max_tokens: 2200,
+      max_tokens: 4096,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: buildUserPrompt(input, cards) }],
-      tools: [REPORT_TOOL],
+      tools: [buildReportToolForInput(input)],
       tool_choice: { type: "tool", name: "submit_report" },
     });
 
