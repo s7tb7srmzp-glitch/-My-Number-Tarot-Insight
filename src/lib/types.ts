@@ -7,6 +7,10 @@ export type IntakeInput = {
   consultDate: string; // YYYY-MM-DD
   /** 내담자가 궁금해하는 점, 최대 3개(선택) */
   questions: string[];
+  /** 내담자 나이(선택) — AI가 어울리는 분야/조언을 생애주기에 맞게 조정하도록 참고용으로만 쓰인다 */
+  age?: number;
+  /** 내담자 직업(선택) — AI가 진로/분야 조언을 그 사람 상황에 맞게 조정하도록 참고용으로만 쓰인다 */
+  occupation?: string;
 };
 
 /**
