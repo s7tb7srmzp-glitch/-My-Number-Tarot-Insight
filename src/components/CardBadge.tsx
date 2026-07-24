@@ -5,18 +5,26 @@ type Props = {
   roleLabel: string;
   cardId: number;
   highlight?: boolean;
+  size?: "md" | "lg";
+  /** 스프레드 배치용 회전/이동 등 추가 클래스 */
+  wrapperClassName?: string;
 };
 
-export default function CardBadge({ roleLabel, cardId, highlight }: Props) {
+export default function CardBadge({
+  roleLabel,
+  cardId,
+  highlight,
+  size = "md",
+  wrapperClassName = "",
+}: Props) {
   const card = getCardById(cardId);
+  const widthClass = size === "lg" ? "w-32 sm:w-40" : "w-24 sm:w-28";
 
   return (
     <div
-      className={`flex w-28 flex-shrink-0 flex-col items-center gap-2 rounded-2xl border p-3 text-center shadow-sm sm:w-32 ${
-        highlight
-          ? "border-rose-400 bg-rose-50"
-          : "border-rose-200 bg-white/80"
-      }`}
+      className={`flex ${widthClass} flex-shrink-0 flex-col items-center gap-2 rounded-2xl border p-3 text-center shadow-sm ${
+        highlight ? "border-rose-400 bg-rose-50" : "border-rose-200 bg-white/80"
+      } ${wrapperClassName}`}
     >
       <span className="text-xs font-medium tracking-wide text-rose-500">
         {roleLabel}

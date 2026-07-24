@@ -41,12 +41,20 @@ export const SYSTEM_PROMPT = `당신은 수비학 타로(자리이타 방식)를
 
 6. 한국어 존댓말로, 부드럽고 정제된 문장으로 작성합니다.
 
-7. submit_report 도구를 사용해 결과를 제출하세요. 기본 섹션 구성(질문이 없을 때 최소 4개):
-   "성격과 영혼(타고난 나)" → "작년에서 올해로 이어지는 삶의 흐름" → "올해의 메시지" →
-   "내년을 준비하며". 내담자가 질문을 남겼다면 위 기본 섹션 뒤에 질문 개수만큼 섹션을
-   추가하세요 (예: "질문 1에 대한 답", "질문 2에 대한 답"처럼 질문 내용을 반영한 소제목).
-   마지막 closing에는 내담자를 다독이는 따뜻한 마무리 인사를 3~4문장으로 담되, 오늘 상담의
-   핵심 메시지를 한 번 더 짧게 요약해서 남기세요.`;
+7. **화면 레이아웃 구조 (매우 중요)**: 이 리포트는 화면에서 두 그룹으로 나뉘어 표시됩니다 —
+   ① 성격카드+영혼카드를 위에 두고 그 설명을 보여주는 "타고난 나" 그룹, ② 작년/올해/내년
+   카드를 스프레드로 펼쳐두고 그 설명을 보여주는 "3년의 흐름" 그룹. 그래서 각 섹션에
+   group 태그를 정확히 붙여야 합니다:
+   - group "core": 성격카드와 영혼카드에 대한 설명 (딱 1개 섹션, 소제목 "성격과 영혼(타고난 나)").
+     이 섹션은 작년/올해/내년 이야기를 절대 포함하지 말고 오직 타고난 성격/영혼 이야기만 다루세요.
+   - group "flow": 작년→올해→내년 흐름에 대한 설명 (2~3개 섹션: "작년에서 올해로 이어지는
+     삶의 흐름", "올해의 메시지", "내년을 준비하며"). 이 섹션들은 성격/영혼 이야기를 새로
+     반복하지 말고 시기적 흐름에 집중하세요.
+   - group "question": 내담자 질문 1개당 정확히 1개 섹션. 질문이 없으면 만들지 마세요.
+
+8. submit_report 도구를 사용해 결과를 제출하세요. 섹션 순서는 항상 core 1개 → flow 2~3개 →
+   question(있는 만큼)입니다. 마지막 closing에는 내담자를 다독이는 따뜻한 마무리 인사를
+   3~4문장으로 담되, 오늘 상담의 핵심 메시지를 한 번 더 짧게 요약해서 남기세요.`;
 
 function buildReportTool(questionCount: number) {
   const minItems = 4 + questionCount;
@@ -65,8 +73,14 @@ function buildReportTool(questionCount: number) {
             properties: {
               heading: { type: "string" as const },
               body: { type: "string" as const },
+              group: {
+                type: "string" as const,
+                enum: ["core", "flow", "question"] as const,
+                description:
+                  "core=성격/영혼 설명(1개), flow=작년~올해~내년 흐름 설명(2~3개), question=질문 답변(질문 1개당 1개)",
+              },
             },
-            required: ["heading", "body"],
+            required: ["heading", "body", "group"],
           },
         },
         closing: { type: "string" as const },

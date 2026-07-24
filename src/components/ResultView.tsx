@@ -8,10 +8,22 @@ type Props = {
   sections: NarrativeSection[];
   closing: string;
   usedAI: boolean;
+  aiFailureReason?: string;
   onGenerateReport: () => void;
   generatingReport: boolean;
   onReset: () => void;
 };
+
+function SectionBlock({ section }: { section: NarrativeSection }) {
+  return (
+    <section className="flex flex-col gap-2">
+      <h3 className="text-base font-medium text-rose-600">{section.heading}</h3>
+      <p className="whitespace-pre-line text-[15px] leading-relaxed text-ink">
+        {section.body}
+      </p>
+    </section>
+  );
+}
 
 export default function ResultView({
   input,
@@ -19,51 +31,109 @@ export default function ResultView({
   sections,
   closing,
   usedAI,
+  aiFailureReason,
   onGenerateReport,
   generatingReport,
   onReset,
 }: Props) {
   const nameLabel = input.name?.trim() ? `${input.name.trim()}님` : "내담자님";
 
+  const coreSections = sections.filter((s) => s.group === "core");
+  const flowSections = sections.filter((s) => s.group === "flow");
+  const questionSections = sections.filter((s) => s.group === "question");
+  // 혹시 group 태그가 없는 예외적인 응답이 오더라도 내용이 누락되지 않도록 안전망을 둔다.
+  const otherSections = sections.filter(
+    (s) => s.group !== "core" && s.group !== "flow" && s.group !== "question"
+  );
+
+  let statusNote: string | null = null;
+  if (!usedAI) {
+    statusNote = aiFailureReason
+      ? `AI 호출에 실패해 기본 서사로 보여드리고 있어요. (${aiFailureReason})`
+      : "AI 연동 키가 설정되지 않아 기본 서사로 보여드리고 있어요.";
+  }
+
   return (
-    <div className="w-full max-w-2xl mx-auto flex flex-col gap-8 px-4 pb-16">
+    <div className="w-full max-w-2xl mx-auto flex flex-col gap-10 px-4 pb-16">
       <div className="text-center">
         <p className="text-sm tracking-widest text-rose-500">상담 리포트</p>
         <h1 className="mt-1 text-2xl font-medium text-ink sm:text-3xl">
-          {nameLabel}의 다섯 카드
+          {nameLabel}의 이야기
         </h1>
-        {!usedAI && (
-          <p className="mt-2 text-xs text-ink-soft">
-            (AI 연동 키가 설정되지 않아 기본 서사로 보여드리고 있어요.)
-          </p>
-        )}
+        {statusNote && <p className="mt-2 text-xs text-ink-soft">{statusNote}</p>}
       </div>
 
-      <div className="flex snap-x gap-3 overflow-x-auto pb-2 sm:justify-center sm:overflow-visible">
-        <CardBadge roleLabel="성격카드" cardId={cards.personality} highlight />
-        <CardBadge roleLabel="영혼카드" cardId={cards.soul} highlight />
-        <CardBadge roleLabel="작년카드" cardId={cards.lastYear} />
-        <CardBadge roleLabel="올해카드" cardId={cards.thisYear} highlight />
-        <CardBadge roleLabel="내년카드" cardId={cards.nextYear} />
-      </div>
-
-      <div className="flex flex-col gap-6 rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8">
-        {sections.map((section, i) => (
-          <section key={i} className="flex flex-col gap-2">
-            <h2 className="text-lg font-medium text-rose-600">
-              {section.heading}
-            </h2>
-            <p className="whitespace-pre-line text-[15px] leading-relaxed text-ink">
-              {section.body}
-            </p>
-          </section>
-        ))}
-
-        <div className="mt-2 border-t border-rose-100 pt-4">
-          <p className="whitespace-pre-line text-[15px] leading-relaxed text-ink-soft italic">
-            {closing}
-          </p>
+      {/* 그룹 1: 타고난 나 (성격 + 영혼) */}
+      <div className="flex flex-col gap-5 rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+        <h2 className="text-center text-lg font-medium text-ink">
+          타고난 나 — 성격과 영혼
+        </h2>
+        <div className="flex justify-center gap-5">
+          <CardBadge roleLabel="성격카드" cardId={cards.personality} highlight size="lg" />
+          <CardBadge roleLabel="영혼카드" cardId={cards.soul} highlight size="lg" />
         </div>
+        <div className="flex flex-col gap-6 border-t border-rose-100 pt-5">
+          {coreSections.map((s, i) => (
+            <SectionBlock key={i} section={s} />
+          ))}
+        </div>
+      </div>
+
+      {/* 그룹 2: 3년의 흐름 스프레드 (작년 - 올해 - 내년) */}
+      <div className="flex flex-col gap-5 rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+        <h2 className="text-center text-lg font-medium text-ink">
+          3년의 흐름 — 작년 · 올해 · 내년
+        </h2>
+        <div className="flex items-end justify-center gap-3 py-2 sm:gap-5">
+          <CardBadge
+            roleLabel="작년카드"
+            cardId={cards.lastYear}
+            wrapperClassName="-rotate-6 translate-y-2"
+          />
+          <CardBadge
+            roleLabel="올해카드"
+            cardId={cards.thisYear}
+            highlight
+            size="lg"
+            wrapperClassName="z-10"
+          />
+          <CardBadge
+            roleLabel="내년카드"
+            cardId={cards.nextYear}
+            wrapperClassName="rotate-6 translate-y-2"
+          />
+        </div>
+        <div className="flex flex-col gap-6 border-t border-rose-100 pt-5">
+          {flowSections.map((s, i) => (
+            <SectionBlock key={i} section={s} />
+          ))}
+        </div>
+      </div>
+
+      {/* 그룹 3: 질문에 대한 답 */}
+      {questionSections.length > 0 && (
+        <div className="flex flex-col gap-6 rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          <h2 className="text-center text-lg font-medium text-ink">
+            궁금하셨던 점에 대한 답
+          </h2>
+          {questionSections.map((s, i) => (
+            <SectionBlock key={i} section={s} />
+          ))}
+        </div>
+      )}
+
+      {otherSections.length > 0 && (
+        <div className="flex flex-col gap-6 rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+          {otherSections.map((s, i) => (
+            <SectionBlock key={i} section={s} />
+          ))}
+        </div>
+      )}
+
+      <div className="rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8">
+        <p className="whitespace-pre-line text-[15px] leading-relaxed text-ink-soft italic">
+          {closing}
+        </p>
       </div>
 
       <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

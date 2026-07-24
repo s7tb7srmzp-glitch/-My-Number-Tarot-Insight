@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import DateSelect from "@/components/DateSelect";
 import type { IntakeInput } from "@/lib/types";
 
 type Props = {
@@ -78,29 +79,21 @@ export default function IntakeForm({ onSubmit, submitting }: Props) {
         />
       </label>
 
-      <label className="flex flex-col gap-1.5 text-sm text-ink">
-        생년월일 <span className="text-rose-500">*</span>
-        <input
-          type="date"
-          required
-          value={birthDate}
-          onChange={(e) => setBirthDate(e.target.value)}
-          className="rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-ink outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
-        />
-      </label>
+      <DateSelect
+        label="생년월일"
+        required
+        value={birthDate}
+        onChange={setBirthDate}
+      />
 
-      <label className="flex flex-col gap-1.5 text-sm text-ink">
-        상담 기준일
-        <input
-          type="date"
-          value={consultDate}
-          onChange={(e) => setConsultDate(e.target.value)}
-          className="rounded-xl border border-rose-200 bg-white px-4 py-2.5 text-ink outline-none transition focus:border-rose-400 focus:ring-2 focus:ring-rose-200"
-        />
-        <span className="text-xs text-ink-soft">
-          올해/작년/내년 카드는 생일을 기준으로 계산돼요. 기본값은 오늘 날짜예요.
-        </span>
-      </label>
+      <DateSelect
+        label="상담 기준일"
+        value={consultDate}
+        onChange={(v) => setConsultDate(v || todayIso())}
+        hint="올해/작년/내년 카드는 생일을 기준으로 계산돼요. 기본값은 오늘 날짜예요."
+        yearFrom={new Date().getFullYear() - 1}
+        yearTo={new Date().getFullYear() + 1}
+      />
 
       <div className="flex flex-col gap-3">
         <p className="text-sm text-ink">
