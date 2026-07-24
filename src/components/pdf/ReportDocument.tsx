@@ -142,7 +142,7 @@ const styles = StyleSheet.create({
 function Footer() {
   return (
     <Text style={styles.footer} fixed>
-      자리이타 수비학 타로 상담 리포트 · 본 리포트는 성찰과 위로를 위한 참고 자료입니다.
+      윤슬의 수비학 타로 상담 리포트 · 본 리포트는 성찰과 위로를 위한 참고 자료입니다.
     </Text>
   );
 }
@@ -181,7 +181,7 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
     <Document title={`${nameLabel} 수비학 타로 상담 리포트`}>
       {/* 1페이지: 타고난 나 (성격 + 영혼) */}
       <Page size="A4" style={styles.page} wrap>
-        <Text style={styles.headerLabel}>자리이타 수비학 타로 상담 리포트</Text>
+        <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
         <Text style={styles.title}>{nameLabel}의 이야기</Text>
         <Text style={styles.subtitle}>
           생년월일 {input.birth.year}.{input.birth.month}.{input.birth.day}
@@ -227,7 +227,7 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
 
       {/* 2페이지: 3년의 흐름 (작년-올해-내년 스프레드) */}
       <Page size="A4" style={styles.page} wrap>
-        <Text style={styles.headerLabel}>자리이타 수비학 타로 상담 리포트</Text>
+        <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
         <Text style={styles.pageHeading}>3년의 흐름 — 작년 · 올해 · 내년</Text>
         <Text style={styles.yearNote}>
           이 세 장은 1월~12월 달력이 아니라 {nameLabel}의 생일({birthdayLabel})을 기준으로
@@ -284,7 +284,7 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
       {/* 3페이지: 질문에 대한 답 (질문이 있을 때만) */}
       {hasQuestionPage && (
         <Page size="A4" style={styles.page} wrap>
-          <Text style={styles.headerLabel}>자리이타 수비학 타로 상담 리포트</Text>
+          <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
           <Text style={styles.pageHeading}>궁금하셨던 점에 대한 답</Text>
           <View style={styles.divider} />
 

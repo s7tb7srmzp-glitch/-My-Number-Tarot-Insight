@@ -31,7 +31,7 @@ export default function AppHeader({ onHome, showHome }: Props) {
         </svg>
         홈
       </button>
-      <span className="text-xs tracking-widest text-ink-soft">자리이타 수비학 타로</span>
+      <span className="text-xs tracking-widest text-ink-soft">윤슬의 수비학 타로</span>
     </header>
   );
 }

@@ -65,7 +65,7 @@ export default function IntakeForm({ onSubmit, submitting }: Props) {
       className="w-full max-w-md mx-auto flex flex-col gap-5 rounded-3xl border border-rose-200 bg-white/70 p-6 shadow-sm backdrop-blur-sm sm:p-8"
     >
       <div className="text-center">
-        <p className="text-sm tracking-widest text-rose-500">자리이타 수비학 타로</p>
+        <p className="text-sm tracking-widest text-rose-500">윤슬의 수비학 타로</p>
         <h1 className="mt-1 text-2xl font-medium text-ink sm:text-3xl">
           나의 숫자, 나의 이야기
         </h1>

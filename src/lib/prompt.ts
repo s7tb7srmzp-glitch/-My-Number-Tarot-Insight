@@ -2,10 +2,12 @@ import type { AllCardsResult } from "./numerology";
 import { getCardById } from "./cardData";
 import type { IntakeInput } from "./types";
 
-export const SYSTEM_PROMPT = `당신은 수비학 타로(자리이타 방식)를 전문으로 하는, 경력이 깊고 통찰력 있는 상담사입니다.
+export const SYSTEM_PROMPT = `당신은 "윤슬의 수비학 타로"라는 이름으로 활동하는, 경력이 깊고 통찰력 있는 수비학 타로 상담사입니다.
 내담자의 성격카드·영혼카드·작년카드·올해카드·내년카드 다섯 장을 근거로,
 그 사람의 삶이 흘러온 흐름과 앞으로의 흐름을 깊이 있고 구체적인 이야기로 풀어내는 것이 당신의 일입니다.
 당신의 리포트는 짧고 뭉뚱그린 요약이 아니라, 실제 대면 상담 한 회기 분량에 맞먹는 충실한 글이어야 합니다.
+계산 방식의 유파나 이론적 배경(예: 특정 계산법의 명칭)은 절대 언급하지 마세요 — 리포트에는 오직
+내담자의 이야기만 담기고, 어떤 방법론 이름도 등장해서는 안 됩니다.
 
 반드시 지킬 것:
 
@@ -129,7 +131,7 @@ export function buildUserPrompt(input: IntakeInput, cards: AllCardsResult): stri
   const specialNotes: string[] = [];
   if (cards.isTwentyTwoSpecial) {
     specialNotes.push(
-      "이 내담자는 자리이타 계산법의 22번 특수 케이스입니다. 일반적인 관례와 달리 " +
+      "이 내담자는 계산상 22번 특수 케이스입니다. 일반적인 관례와 달리 " +
         "성격카드는 4번(황제), 영혼카드는 0번(바보)로 뒤바뀌어 계산됩니다. 이 독특한 조합이 " +
         "가진 의미(현실적 토대를 갖추려는 성격 이면에, 영혼 깊은 곳엔 완전히 자유롭고 " +
         "새로 시작하려는 갈망이 있음)를 이야기에 녹여주세요."
@@ -137,7 +139,7 @@ export function buildUserPrompt(input: IntakeInput, cards: AllCardsResult): stri
   }
   if (cards.isNineteenSpecial) {
     specialNotes.push(
-      "성격카드가 19번(태양)으로 나왔습니다. 자리이타 계산법에서는 19, 10, 1이 모두 함께 " +
+      "성격카드가 19번(태양)으로 나왔습니다. 이 계산 방식에서는 19, 10, 1이 모두 함께 " +
         "의미를 갖습니다 — 19의 밝은 창조성과 생명력, 10이 상징하는 전환과 기회, 그리고 " +
         "그 창조성을 어떻게 세상에 전달할지(1, 마법사)를 배우는 것이 이번 생의 과제임을 " +
         "함께 짚어주세요."
