@@ -24,12 +24,19 @@ export function buildFallbackNarrative(
     ? `${nameLabel}의 성격카드와 영혼카드는 모두 ${cards.personality}번 ${personality.nameKo}예요. ` +
       `겉으로 드러나는 모습과 마음 깊은 곳의 본성이 같은 카드로 나타났다는 건, 겉과 속이 다르지 않고 ` +
       `한결같은 사람이라는 뜻이기도 해요. ${personality.traits.slice(0, 3).join(", ")} 같은 면이 삶 전반에 ` +
-      `걸쳐 뚜렷하게 드러날 거예요. ${personality.advice} 특히 ${personality.careers.slice(0, 2).join(", ")} 같은 ` +
-      `분야에서 이 기질이 잘 발휘될 수 있어요.`
+      `걸쳐 뚜렷하게 드러날 거예요. 처음 만난 사람도, 오래 알고 지낸 사람도 ${nameLabel}에게서 비슷한 인상을 ` +
+      `받는 편일 텐데, 그건 꾸며낸 모습과 실제 속마음 사이에 거리가 거의 없기 때문이에요. ${personality.advice} ` +
+      `특히 ${personality.careers.slice(0, 3).join(", ")} 같은 분야에서 이 기질이 잘 발휘될 수 있어요. ` +
+      `겉과 속이 같다는 건 스스로를 설명하기 쉽다는 장점이 있는 반면, 다른 모습을 시도해볼 여지가 좁게 ` +
+      `느껴질 수도 있으니, 가끔은 이 틀 밖으로도 나를 확장해보는 시도가 좋은 자극이 될 수 있어요.`
     : `${nameLabel}의 성격카드는 ${cards.personality}번 ${personality.nameKo}, 영혼카드는 ${cards.soul}번 ${soul.nameKo}이에요. ` +
-      `겉으로 드러나는 모습에는 ${personality.traits[0]} 같은 면이 있고, 그 안쪽 깊은 곳에는 ${soul.traits[0]} 같은 마음이 ` +
-      `자리하고 있어요. 이 둘이 부딪힐 때도 있겠지만, ${personality.careers[0]} 같은 분야에서는 오히려 그 둘이 함께 ` +
-      `힘을 발휘할 수 있어요. ${personality.advice} 그리고 더 깊은 곳에서는, ${soul.advice}`;
+      `겉으로 드러나는 모습에는 ${personality.traits.slice(0, 2).join(", ")} 같은 면이 있고, 그 안쪽 깊은 곳에는 ` +
+      `${soul.traits.slice(0, 2).join(", ")} 같은 마음이 자리하고 있어요. 사람들은 대개 ${personality.nameKo} ` +
+      `카드가 보여주는 겉모습만으로 ${nameLabel}을 판단하기 쉽지만, 정작 스스로를 움직이는 동력은 훨씬 더 ` +
+      `안쪽의 ${soul.nameKo} 카드다운 마음에서 나오는 경우가 많아요. 이 둘이 부딪힐 때도 있겠지만, ` +
+      `${personality.careers.slice(0, 2).join(", ")} 같은 분야에서는 오히려 그 둘이 함께 힘을 발휘할 수 있어요. ` +
+      `${personality.advice} 그리고 더 깊은 곳에서는, ${soul.advice} 겉모습과 속마음이 서로 다른 결을 가진 ` +
+      `만큼, 둘 중 하나만 억누르기보다 상황에 따라 번갈아 꺼내 쓰는 유연함이 ${nameLabel}만의 강점이 될 수 있어요.`;
 
   const sections: NarrativeSection[] = [
     {
