@@ -271,7 +271,7 @@ function CoverPage({ nameLabel, consultDate }: { nameLabel: string; consultDate:
 
 function SectionBlock({ section }: { section: NarrativeSection }) {
   return (
-    <View wrap={false}>
+    <View>
       <Text style={styles.sectionHeading}>{section.heading}</Text>
       <Text style={styles.sectionBody}>{section.body}</Text>
     </View>
@@ -304,8 +304,8 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
       {/* 표지 */}
       <CoverPage nameLabel={nameLabel} consultDate={input.consultDate} />
 
-      {/* 1페이지: 타고난 나 (성격 + 영혼) */}
-      <Page size="A4" style={styles.page} wrap>
+      {/* 1페이지: 타고난 나 — 카드 스프레드만 (설명은 다음 페이지) */}
+      <Page size="A4" style={styles.page}>
         <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
         <Text style={styles.title}>{nameLabel}의 이야기</Text>
         <Text style={styles.subtitle}>
@@ -315,7 +315,12 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
 
         <Text style={styles.pageHeading}>타고난 나 — 성격과 영혼</Text>
 
-        <View style={styles.cardRow}>
+        <View style={{ flex: 1 }} />
+
+        <View style={styles.coverBlock}>
+          <RippleOrnament />
+        </View>
+        <View style={[styles.cardRow, { marginTop: 18 }]}>
           <View style={styles.cardColWide}>
             <Text style={styles.cardRole}>성격카드</Text>
             {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image, not an HTML img */}
@@ -334,24 +339,28 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
           </View>
         </View>
 
+        <View style={{ flex: 1.4 }} />
+
+        <Footer />
+      </Page>
+
+      {/* 2페이지: 타고난 나 — 설명 (카드와 같은 페이지에 억지로 욱여넣지 않고
+          분리해서, 실제 AI 서사처럼 글이 길 때도 카드가 텅 빈 페이지에 덩그러니
+          남지 않고 설명이 온전한 한 페이지를 차지하도록 한다). */}
+      <Page size="A4" style={styles.page} wrap>
+        <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
+        <Text style={styles.pageHeading}>타고난 나 — 성격과 영혼</Text>
         <View style={styles.divider} />
 
         {coreSections.map((s, i) => (
           <SectionBlock key={i} section={s} />
         ))}
 
-        {!hasQuestionPage && otherSections.length === 0 && (
-          <>
-            <View style={styles.divider} />
-            <Text style={styles.closing}>{closing}</Text>
-          </>
-        )}
-
         <Footer />
       </Page>
 
-      {/* 2페이지: 3년의 흐름 (작년-올해-내년 스프레드) */}
-      <Page size="A4" style={styles.page} wrap>
+      {/* 3페이지: 3년의 흐름 — 카드 스프레드만 */}
+      <Page size="A4" style={styles.page}>
         <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
         <Text style={styles.pageHeading}>3년의 흐름 — 작년 · 올해 · 내년</Text>
         <Text style={styles.yearNote}>
@@ -359,7 +368,12 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
           나뉘어요. 생일부터 다음 생일 전날까지가 한 해로 이어집니다.
         </Text>
 
-        <View style={styles.cardRow}>
+        <View style={{ flex: 1 }} />
+
+        <View style={styles.coverBlock}>
+          <RippleOrnament />
+        </View>
+        <View style={[styles.cardRow, { marginTop: 18 }]}>
           <View style={styles.cardCol}>
             <Text style={styles.cardRole}>작년카드</Text>
             {/* eslint-disable-next-line jsx-a11y/alt-text -- @react-pdf/renderer Image, not an HTML img */}
@@ -386,6 +400,15 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
           </View>
         </View>
 
+        <View style={{ flex: 1.4 }} />
+
+        <Footer />
+      </Page>
+
+      {/* 4페이지: 3년의 흐름 — 설명 */}
+      <Page size="A4" style={styles.page} wrap>
+        <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
+        <Text style={styles.pageHeading}>3년의 흐름 — 작년 · 올해 · 내년</Text>
         <View style={styles.divider} />
 
         {flowSections.map((s, i) => (
@@ -406,7 +429,7 @@ export default function ReportDocument({ input, cards, sections, closing }: Prop
         <Footer />
       </Page>
 
-      {/* 3페이지: 질문에 대한 답 (질문이 있을 때만) */}
+      {/* 5페이지: 질문에 대한 답 (질문이 있을 때만) */}
       {hasQuestionPage && (
         <Page size="A4" style={styles.page} wrap>
           <Text style={styles.headerLabel}>윤슬의 수비학 타로 상담 리포트</Text>
